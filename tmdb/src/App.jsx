@@ -1,17 +1,26 @@
+// SUBMITTED BY: GROUP (CIT-07)
+// Members: Abhishek Dangol (stud-abhishek@ruc.dk)
+//          Dipu Khatri (stud-dipu@ruc.dk)
+//          Nischal Ghimire (stud-nischal@ruc.dk)
+//          Pema Gyalbu Lama (stud-gyalbu@ruc.dk)
+
 import { useEffect, useState } from 'react'
 import './App.css'
 
-// API key and query. Read key from Vite env variable `VITE_TMDB_API_KEY`.
-// If the env var is not set, fall back to the original key so the app still works.
 const KEY = import.meta.env.VITE_TMDB_API_KEY
 const QUERY = 'spielberg'
 
+/**
+ * Main App component.
+ * Implements Task 3 (Fetch persons) and Task 5 (Pagination).
+ */
 function App() {
   const [persons, setPersons] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [i, setI] = useState(0) // index of shown person
 
+  // Task 3: Fetch persons when component mounts
   useEffect(() => {
     const url = 'https://api.themoviedb.org/3/search/person?query=' +
       encodeURIComponent(QUERY) + '&api_key=' + KEY
@@ -28,6 +37,7 @@ function App() {
       .finally(() => setLoading(false))
   }, [])
 
+  // Task 5: Navigation buttons
   function prev() {
     setI((n) => Math.max(0, n - 1))
   }
@@ -46,12 +56,14 @@ function App() {
 
       {!loading && persons.length > 0 && (
         <div>
+          {/* Task 5: Buttons controlling which person to render */}
           <div className="simple-nav">
             <button onClick={prev} disabled={i === 0}>Prev</button>
             <span>{i + 1} / {persons.length}</span>
             <button onClick={next} disabled={i === persons.length - 1}>Next</button>
           </div>
 
+          {/* Task 4: Render Person component */}
           <Person person={persons[i]} />
         </div>
       )}
@@ -59,7 +71,11 @@ function App() {
   )
 }
 
-// --- simple Person component (inline, student-style)
+/**
+ * Person component.
+ * Implements Task 4 (Render person fields) and Task 7 (Render images).
+ * @param {Object} props.person - The person object to display
+ */
 function Person({ person }) {
   if (!person) return null
   return (
@@ -75,6 +91,7 @@ function Person({ person }) {
 
       <div>
         <h3>Known for</h3>
+        {/* Task 6: Render "known for" list */}
         {person.known_for && person.known_for.length > 0 ? (
           person.known_for.map((k) => (
             <KnownFor key={k.id} item={k} />
@@ -86,13 +103,18 @@ function Person({ person }) {
 
       <div>
         <h3>Images</h3>
+        {/* Task 7: Render additional images */}
         <ImagesFor id={person.id} />
       </div>
     </div>
   )
 }
 
-// KnownFor component (very small)
+/**
+ * KnownFor component.
+ * Implements Task 6 (Display known_for entry).
+ * @param {Object} props.item - The movie/show object
+ */
 function KnownFor({ item }) {
   if (!item) return null
   const title = item.title || item.name || 'No title'
@@ -106,7 +128,11 @@ function KnownFor({ item }) {
   )
 }
 
-// ImagesFor: fetch small thumbnails and render them
+/**
+ * ImagesFor component.
+ * Implements Task 7 (Fetch and render pictures of a person).
+ * @param {number} props.id - The person ID
+ */
 function ImagesFor({ id }) {
   const [imgs, setImgs] = useState([])
   const [loading, setLoading] = useState(true)
